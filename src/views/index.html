@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Teste Socket.io - Node.js + Postgres - Sustentabee</title>
+</head>
+
+<body>
+    <h1>Teste Socket.io - Node.js + Postgres - Sustentabee</h1>
+    <input type="text" id="alert" />
+    <button onclick="generateAlert()">Enviar Alerta</button>
+    <ul id="messages"></ul>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.js"></script>
+    <script>
+        $(function () {
+            var socket = io();
+            socket.on('alertas', function (msg) {
+                $('#messages').append($('<li>').text(msg.description));
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+        });
+        async function generateAlert() {
+            let description = document.getElementById("alert").value;
+            const alert = { description: description + " - " + new Date() }
+            await axios.post("http://localhost:3333/alert", alert)
+                .then(() => { })
+                .catch(error => { })
+        }
+        async function getAlert() {
+            const response = await axios.get("http://localhost:3333/alert");
+            for (let i = 0; i < response.data.length; i++) {
+                const msg = response.data[i];
+                $('#messages').append($('<li>').text(msg.description));
+            }
+        }
+        getAlert();
+    </script>
+</body>
+
+</html>
